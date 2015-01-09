@@ -1,0 +1,2 @@
+# prettygood
+Smaller projects
