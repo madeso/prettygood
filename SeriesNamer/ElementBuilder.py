@@ -72,12 +72,12 @@ namespace PrettyGood.Util
             return this;
         }
 
-		public ElementBuilder cdata(string text)
-		{
-			XmlCDataSection t = Document.CreateCDataSection(text);
-			Node.AppendChild(t);
-			return this;
-		}
+        public ElementBuilder cdata(string text)
+        {
+            XmlCDataSection t = Document.CreateCDataSection(text);
+            Node.AppendChild(t);
+            return this;
+        }
 
         public XmlDocument Document
         {
@@ -124,10 +124,10 @@ namespace PrettyGood.Util
 
         private static string BuildTarget(params KeyValuePair<string, string>[] args)
         {
-			return
-				new StringListCombiner(" ").combineFromEnumerable(
-					new StringList().AddRange<string, string>(args, "{0} = \"{1}\"")
-					);
+            return
+                new StringListCombiner(" ").combineFromEnumerable(
+                    new StringList().AddRange<string, string>(args, "{0} = \"{1}\"")
+                    );
         }
         private static KeyValuePair<string, string> SingleTarget(string key, string val)
         {

@@ -6,11 +6,11 @@ using Feed;
 
 namespace Rss
 {
-	public class EntryPoint
-	{
-		public IEnumerable<ItemProvider> Providers()
-		{
-			yield return new RssProvider();
-		}
-	}
+    public class EntryPoint
+    {
+        public IEnumerable<ItemProvider> Providers()
+        {
+            yield return new RssProvider();
+        }
+    }
 }

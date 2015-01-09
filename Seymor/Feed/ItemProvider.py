@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Feed
 {
-	public abstract class ItemProvider
-	{
-		// return null if data is "unsuported"
-		public abstract CurrentData sample(string doc);
-	}
+    public abstract class ItemProvider
+    {
+        // return null if data is "unsuported"
+        public abstract CurrentData sample(string doc);
+    }
 }

@@ -7,21 +7,21 @@ using PrettyGood.Util;
 
 namespace PrettyGood.LastFm
 {
-	public class Error : Exception
-	{
-		public readonly int error;
-		public readonly string message;
+    public class Error : Exception
+    {
+        public readonly int error;
+        public readonly string message;
 
-		public Error(XmlElement error)
-		{
-			XmlElement errel = Xml.GetFirstChild(error, "error");
-			this.error = int.Parse(Xml.GetAttributeString(errel, "code"));
-			this.message = errel.InnerText;
-		}
+        public Error(XmlElement error)
+        {
+            XmlElement errel = Xml.GetFirstChild(error, "error");
+            this.error = int.Parse(Xml.GetAttributeString(errel, "code"));
+            this.message = errel.InnerText;
+        }
 
-		public override string ToString()
-		{
-			return "Last.fm error: " + message;
-		}
-	}
+        public override string ToString()
+        {
+            return "Last.fm error: " + message;
+        }
+    }
 }

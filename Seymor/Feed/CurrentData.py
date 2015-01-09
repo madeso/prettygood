@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Feed
 {
-	public class CurrentData
-	{
-		public Info Info = new Info();
-		public List<Item> Items = new List<Item>();
-	}
+    public class CurrentData
+    {
+        public Info Info = new Info();
+        public List<Item> Items = new List<Item>();
+    }
 }

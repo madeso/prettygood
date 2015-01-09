@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Seymour
 {
-	public interface Adder
-	{
-		void add(Channel c);
-	}
+    public interface Adder
+    {
+        void add(Channel c);
+    }
 }

@@ -5,11 +5,11 @@ using System.Text;
 
 namespace Feed
 {
-	public class NullItemProvider : ItemProvider
-	{
-		public override CurrentData sample(string doc)
-		{
-			return null;
-		}
-	}
+    public class NullItemProvider : ItemProvider
+    {
+        public override CurrentData sample(string doc)
+        {
+            return null;
+        }
+    }
 }

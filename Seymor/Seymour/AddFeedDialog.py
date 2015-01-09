@@ -9,38 +9,38 @@ using System.Windows.Forms;
 
 namespace Seymour
 {
-	public partial class AddFeedDialog : Form
-	{
-		public AddFeedDialog()
-		{
-			InitializeComponent();
-		}
+    public partial class AddFeedDialog : Form
+    {
+        public AddFeedDialog()
+        {
+            InitializeComponent();
+        }
 
-		public string Url
-		{
-			get
-			{
-				return dFeedUrl.Text;
-			}
-		}
+        public string Url
+        {
+            get
+            {
+                return dFeedUrl.Text;
+            }
+        }
 
-		private void AddFeedDialog_Load(object sender, EventArgs e)
-		{
-			dFeedUrl.SelectAll();
-			dFeedUrl.Focus();
-			this.ActiveControl = dFeedUrl;
-		}
+        private void AddFeedDialog_Load(object sender, EventArgs e)
+        {
+            dFeedUrl.SelectAll();
+            dFeedUrl.Focus();
+            this.ActiveControl = dFeedUrl;
+        }
 
-		private void dOk_Click(object sender, EventArgs e)
-		{
-			DialogResult = DialogResult.OK;
-			Close();
-		}
+        private void dOk_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.OK;
+            Close();
+        }
 
-		private void dCancel_Click(object sender, EventArgs e)
-		{
-			DialogResult = DialogResult.Cancel;
-			Close();
-		}
-	}
+        private void dCancel_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+            Close();
+        }
+    }
 }

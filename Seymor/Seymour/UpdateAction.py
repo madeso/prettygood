@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Seymour
 {
-	public abstract class UpdateAction
-	{
-		public abstract void perform();
-	}
+    public abstract class UpdateAction
+    {
+        public abstract void perform();
+    }
 }

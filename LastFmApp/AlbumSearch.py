@@ -11,28 +11,28 @@ using PrettyGood.Util;
 
 namespace LastFmApp
 {
-	public partial class AlbumSearch : Form
-	{
-		public AlbumSearch(MainWindow.Data data)
-		{
-			InitializeComponent();
+    public partial class AlbumSearch : Form
+    {
+        public AlbumSearch(MainWindow.Data data)
+        {
+            InitializeComponent();
 
-			app = new PrettyGood.LastFm.LastFm(data.ApiKey);
-		}
+            app = new PrettyGood.LastFm.LastFm(data.ApiKey);
+        }
 
-		PrettyGood.LastFm.LastFm app;
+        PrettyGood.LastFm.LastFm app;
 
-		private void dSearch_Click(object sender, EventArgs e)
-		{
-			dResult.ClearObjects();
-			try
-			{
-				dResult.SetObjects(app.album.search(dAlbum.Text));
-			}
-			catch (Error err)
-			{
-				Gui.error(err.Message);
-			}
-		}
-	}
+        private void dSearch_Click(object sender, EventArgs e)
+        {
+            dResult.ClearObjects();
+            try
+            {
+                dResult.SetObjects(app.album.search(dAlbum.Text));
+            }
+            catch (Error err)
+            {
+                Gui.error(err.Message);
+            }
+        }
+    }
 }
