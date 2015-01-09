@@ -130,6 +130,7 @@ class KeyValueExtractor:
                 count += calculator(m.data)
         return count
 
+
 def Compile(apattern):
     pattern = os.path.normpath(apattern)
     p = KeyValueExtractor()
@@ -166,17 +167,17 @@ def Compile(apattern):
 
 if __name__ == "__main__":
     t = Compile("%album%/%artist%-%title%")
-    print t
-    print "------------------"
-    print t.extract("songs/crap/Cannibal/Ke$ha-Crazy Beautiful Life.mp3")
-    print t.extract("songs/One Of The Boys/Katy Perry-I Kissed A Girl.mp3")
-    print t.extract("All I Ever Wanted/Kelly Clarkson-Long Shot.mp3")
-    print t.extract("music.mp3")
-    print t.extract("the las - There she goes again.mp3")
+    print(t)
+    print("------------------")
+    print(t.extract("songs/crap/Cannibal/Ke$ha-Crazy Beautiful Life.mp3"))
+    print(t.extract("songs/One Of The Boys/Katy Perry-I Kissed A Girl.mp3"))
+    print(t.extract("All I Ever Wanted/Kelly Clarkson-Long Shot.mp3"))
+    print(t.extract("music.mp3"))
+    print(t.extract("the las - There she goes again.mp3"))
     
-    print "------------------"
+    print("------------------")
     t = Compile("%artist%-%album%/%track%.%title% by %artist%")
-    print t
-    print t.extract("Miss Li - Beats and bruises/3. My Man by Miss Li.mp3")
-    print t.extract("Miss Li - Beats and bruises/4. Hit it.mp3")
-    print t.extract("Miss Li - Beats and bruises/5. Forever Drunk by mis li.mp3")
+    print(t)
+    print(t.extract("Miss Li - Beats and bruises/3. My Man by Miss Li.mp3"))
+    print(t.extract("Miss Li - Beats and bruises/4. Hit it.mp3"))
+    print(t.extract("Miss Li - Beats and bruises/5. Forever Drunk by mis li.mp3"))
