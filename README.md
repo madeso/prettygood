@@ -1,2 +1,2 @@
 # prettygood
-Smaller projects
+Here lies smaller projects that I've made.
