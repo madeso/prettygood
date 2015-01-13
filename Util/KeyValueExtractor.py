@@ -1,5 +1,6 @@
 ﻿import os
 
+
 def _CountDirectorySeperators(pattern):
     count = 0
     for c in pattern:
@@ -7,23 +8,29 @@ def _CountDirectorySeperators(pattern):
             count += 1
     return count
 
+
 class FormatError(Exception):
     pass
+
 
 class Match:
     isText = False
     data = ""
+
     def __str__(self):
         if self.isText:
             return self.data.replace("%", "%%")
         else:
             return "%" + self.data + "%"
 
+
 class Complexity:
-        Arguments=0
-        Verifiers=0
-        def __str__(self):
-            return "<%(args)s / %(ver)s>" % {"args": self.Arguments, "ver": self.Verifiers}
+    Arguments = 0
+    Verifiers = 0
+
+    def __str__(self):
+        return "<%(args)s / %(ver)s>" % {"args": self.Arguments, "ver": self.Verifiers}
+
 
 class KeyValueExtractor:
     def __init__(self):
@@ -46,7 +53,7 @@ class KeyValueExtractor:
         self.matchers.append(m)
         self.numberOfDirectorySeperators += _CountDirectorySeperators(t)
         return self
-    
+
 
     def _addArgument(self, t):
         m = Match()
@@ -58,14 +65,12 @@ class KeyValueExtractor:
     def extract(self, fi):
         t = self._getSearchableString(fi)
         return self._subExtract(t)
-    
 
     def __str__(self):
         s = ""
         for m in self.matchers:
             s += str(m)
         return s
-    
 
     def _subExtract(self, text):
         start = 0
@@ -76,12 +81,14 @@ class KeyValueExtractor:
             if matcher.isText:
                 end = text.find(matcher.data, start)
                 if end == -1:
-                    return result, 'Unable to find %(search)s in %(data)s' % {"search" : matcher.data, "data": text[start:]}
+                    return result, 'Unable to find %(search)s in %(data)s' % {"search": matcher.data,
+                                                                              "data": text[start:]}
                 
                 if arg != "":
                     val = text[start:end]
                     if not self._setVariable(result, arg, val):
-                        return result, "Unable to apply <%(val)s> to %(arg)s, already contains <%(src)s>" % {"val": val,"arg": arg, "src":result[arg]}
+                        return result, "Unable to apply <%(val)s> to %(arg)s, already contains <%(src)s>" % \
+                               {"val": val, "arg": arg, "src": result[arg]}
                     arg = ""
                 start = end + len(matcher.data)
             else:
@@ -92,11 +99,13 @@ class KeyValueExtractor:
         if arg != "":
             val = text[start:]
             if not self._setVariable(result, arg, val):
-                return result, "Unable to apply <%(val)s> to %(arg)s, already contains <%(src)s>" % {"val": val,"arg": arg, "src":result[arg]}
+                return result, "Unable to apply <%(val)s> to %(arg)s, already contains <%(src)s>" % {"val": val,
+                                                                                                     "arg": arg,
+                                                                                                     "src": result[arg]}
         return result, ""
-    
 
-    def _setVariable(self, container, varname, value):
+    @staticmethod
+    def _setVariable(container, varname, value):
         if varname in container:
             old = container[varname].lower().replace("_", "").strip().lstrip("0")
             new = value.lower().replace("_", "").strip().lstrip("0")
@@ -104,10 +113,9 @@ class KeyValueExtractor:
                 return False
         container[varname] = value
         return True
-    
 
-    #def calculateComplexity(self):
-    #    counts = {}
+    # def calculateComplexity(self):
+    # counts = {}
     #    for m in self.matchers:
     #        if m.isText == False:
     #            varname = m.data.lower()
@@ -121,12 +129,11 @@ class KeyValueExtractor:
     #    cx.Arguments = counts.Count(lambda(x): x.Value > 0)
     #    cx.Verifiers = counts.Count(lambda(x): x.Value > 1)
     #    return cx
-    
 
     def countInText(self, calculator):
         count = 0
         for m in self.matchers:
-            if m.isText == True:
+            if m.isText:
                 count += calculator(m.data)
         return count
 
@@ -164,6 +171,7 @@ def Compile(apattern):
     if st != "":
         p._addText(st)
     return p
+
 
 if __name__ == "__main__":
     t = Compile("%album%/%artist%-%title%")
