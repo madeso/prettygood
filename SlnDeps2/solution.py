@@ -65,7 +65,7 @@ class Solution:
         lines.append("digraph " + self.Name.replace("-", "_") + " {")
         lines.append("/* projects */")
         for _, pro in self.projects.items():
-            if self.Exclude(pro.Name):
+            if self.Exclude(pro.DisplayName):
                 continue
             decoration = "label=\"" + pro.DisplayName + "\""
             shape = "plaintext"
@@ -91,7 +91,7 @@ class Solution:
             else:
                 addspace = True
             for s in p.deps:
-                if self.Exclude(s.Name):
+                if self.Exclude(s.DisplayName):
                     continue
                 if self.reverseArrows:
                     lines.append(" " + s.Name + " -> " + p.Name + ";")
