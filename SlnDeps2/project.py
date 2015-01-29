@@ -1,6 +1,7 @@
 from enum import Enum
 import os.path
 import xml.etree.ElementTree as ET
+import re
 
 
 class Build(Enum):
@@ -45,7 +46,7 @@ class Project:
         """
         @retype: string
         """
-        return self.DisplayName.replace('-', '_')
+        return self.DisplayName.replace('-', '_').replace('.', '_')
 
     @Name.setter
     def Name(self, value):
@@ -61,17 +62,27 @@ class Project:
         """
         :param projects: dict[string, Project]
         """
-        for s in self.sdeps:
-            self.deps.append(projects[s])
+        # print("Resolving ", self.Name, len(self.sdeps))
+        for ss in self.sdeps:
+            s = ss.lower()
+            if s in projects:
+                self.deps.append(projects[s])
+            else:
+                print("Missing reference ", s)
 
     def loadInformation(self):
         p = Gen(self.Path)
-        if not os.path.isfile(p):
+        if p == "":
             return
-        doc = ET.parse(p)
+        if not os.path.isfile(p):
+            print("Unable to open project file: ", p)
+            return
+        document = ET.parse(p)
+        doc = document.getroot()
+        namespace = get_namespace(doc)
         l = []
         """:type : list[string]"""
-        for n in doc.getroot().findall("VisualStudioProject/Configurations/Configuration[@ConfigurationType]"):
+        for n in doc.findall("{0}VisualStudioProject/{0}Configurations/{0}Configuration[@ConfigurationType]".format(namespace)):
             v = n.attrib["ConfigurationType"]
             if v in l is False:
                 l.append(v)
@@ -85,6 +96,20 @@ class Project:
                 self.Type = Build.Static
             elif suggestedType == "1":
                 self.Type = Build.Application
+        for n in doc.findall("./{0}PropertyGroup/{0}OutputType".format(namespace)):
+            inner_text = n.text.strip().lower()
+            if inner_text == "winexe":
+                self.Type = Build.Application
+            elif inner_text == "exe":
+                self.Type = Build.Application
+            elif inner_text == "library":
+                self.Type = Build.Shared
+            else:
+                print("Unknown build type in ", p, ": ", inner_text)
+        for n in doc.findall("./{0}ItemGroup/{0}ProjectReference/{0}Project".format(namespace)):
+            inner_text = n.text.strip().lower()
+            self.sdeps.append(inner_text)
+
 
 def Gen(pa):
     """
@@ -97,4 +122,11 @@ def Gen(pa):
     p = pa + ".vcxproj"
     if os.path.isfile(p):
         return p
+    p = pa + ".csproj"
+    if os.path.isfile(p):
+        return p
     return ""
+
+def get_namespace(element):
+  m = re.match('\{.*\}', element.tag)
+  return m.group(0) if m else ''

@@ -64,7 +64,7 @@ def logic(solutionFilePath, exlude, targetFile, format, simplify, style, reverse
     :type reverseArrows: bool
     """
     s = solution.Solution(solutionFilePath, exlude, simplify, reverseArrows)
-    s.writeGraphviz(targetFile)
+    s.writeGraphviz(targetFile + ".graphviz")
     graphviz(targetFile, format, style)
 
 def graphviz(targetFile, format, style):
@@ -74,6 +74,6 @@ def graphviz(targetFile, format, style):
     :type format: string
     :type style: string
     """
-    cmdline = ["dot", "-T" + format, "-K" + style, "-O " + targetFile]
-    print(cmdline)
-    # s = subprocess.call(["dot", "-T" + format, "-K" + style, "-O " + targetFile])
+    cmdline = ["dot", targetFile+".graphviz", "-T" + format, "-K" + style, "-O " + targetFile + "." + format]
+    print("Running graphviz ", cmdline)
+    s = subprocess.call(cmdline)

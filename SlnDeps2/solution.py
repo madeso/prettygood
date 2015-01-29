@@ -40,7 +40,7 @@ class Solution:
                 relativepath = data[1].strip().strip('"').strip()
                 id = data[2].strip().strip('"').strip()
                 currentProject = project.Project(Solution=self, Name=name, Path=os.path.join(os.path.dirname(slnpath), relativepath), Id=id)
-                self.projects[currentProject.Id] = currentProject
+                self.projects[currentProject.Id.lower()] = currentProject
             elif line == "EndProject":
                 currentProject = None
                 depProject = None
@@ -64,8 +64,6 @@ class Solution:
         """:type : list[string]"""
         lines.append("digraph " + self.Name.replace("-", "_") + " {")
         lines.append("/* projects */")
-        lines.append("")
-
         for _, pro in self.projects.items():
             if self.Exclude(pro.Name):
                 continue
@@ -81,10 +79,10 @@ class Solution:
             lines.append(" " + pro.Name + " [" + decoration + "]" + ";")
         lines.append("")
         lines.append("/* dependencies */")
-        lines.append("")
         addspace = False
         for _, p in self.projects.items():
             if len(p.deps) == 0:
+                # print("not enough ", p.Name)
                 continue
             if self.Exclude(p.Name):
                 continue
@@ -95,7 +93,7 @@ class Solution:
             for s in p.deps:
                 if self.Exclude(s.Name):
                     continue
-                if reverseArrows:
+                if self.reverseArrows:
                     lines.append(" " + s.Name + " -> " + p.Name + ";")
                 else:
                     lines.append(" " + p.Name + " -> " + s.Name + ";")
@@ -110,8 +108,8 @@ class Solution:
         if self.includes is not None:
             for s in self.includes:
                 if s.lower().strip() == p.lower().strip():
-                    return False
-        return True
+                    return True
+        return False
 
     def writeGraphviz(self, targetFile):
         """
