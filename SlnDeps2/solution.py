@@ -27,7 +27,7 @@ class Solution:
         @type dosimplify: bool
         """
         self.includes = exclude
-        self.Name = os.path.splitext(slnpath)[0]
+        self.Name = os.path.basename(os.path.splitext(slnpath)[0])
         with open(slnpath) as f:
             lines = f.readlines()
         currentProject = None
@@ -48,12 +48,12 @@ class Solution:
                 depProject = currentProject
             elif depProject != None and line.strip().startswith("{"):
                 id = line.split("=")[0].strip()
-                depProject.sdeps.Add(id)
+                depProject.sdeps_append(id)
         if dosimplify:
             self.simplify()
         for project_id, p in self.projects.items():
-            p.resolve(self.projects)
             p.loadInformation()
+            p.resolve(self.projects)
 
     @property
     def Graphviz(self):

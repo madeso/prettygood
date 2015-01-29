@@ -16,8 +16,6 @@ def toGraphviz(source, target, format, exclude, simplify, style, reverseArrows):
     my_target = target or ""
     if my_target.strip() == "" or my_target.strip() == "?":
         my_target = os.path.splitext(source)[0]
-    if os.path.isdir(my_target):
-        my_target = os.path.join(my_target, os.path.splitext(os.path.basename(source))[0])
     my_format = format or ""
     if my_format.strip() == "" or my_format.strip() == "?":
         my_format = "svg"
@@ -74,6 +72,6 @@ def graphviz(targetFile, format, style):
     :type format: string
     :type style: string
     """
-    cmdline = ["dot", targetFile+".graphviz", "-T" + format, "-K" + style, "-O " + targetFile + "." + format]
+    cmdline = ["dot", targetFile+".graphviz", "-T" + format, "-K" + style, "-O" + targetFile + "." + format]
     print("Running graphviz ", cmdline)
     s = subprocess.call(cmdline)

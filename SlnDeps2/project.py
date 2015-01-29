@@ -21,13 +21,6 @@ class Project:
     :type deps: list[Project]
     :type sdeps: list[string]
     """
-    Solution = None
-    DisplayName = ""
-    Path = ""
-    Id = ""
-    Type = Build.Unknown
-    deps = []
-    sdeps = []
 
     def __init__(self, Solution, Name, Path, Id):
         """
@@ -36,6 +29,12 @@ class Project:
         :type Path: string
         :type Id: string
         """
+
+        self.DisplayName = ""
+        self.Type = Build.Unknown
+        self.deps = []
+        self.sdeps = []
+
         self.Solution = Solution
         self.Name = Name
         self.Path = Path
@@ -107,9 +106,15 @@ class Project:
             else:
                 print("Unknown build type in ", p, ": ", inner_text)
         for n in doc.findall("./{0}ItemGroup/{0}ProjectReference/{0}Project".format(namespace)):
-            inner_text = n.text.strip().lower()
-            self.sdeps.append(inner_text)
+            inner_text = n.text.strip()
+            self.sdeps_append(inner_text)
 
+    def sdeps_append(self, dep):
+        """
+        :type dep: string
+        """
+        self.sdeps.append(dep.lower())
+        pass
 
 def Gen(pa):
     """
