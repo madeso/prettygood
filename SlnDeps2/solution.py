@@ -49,10 +49,11 @@ class Solution:
             elif depProject != None and line.strip().startswith("{"):
                 id = line.split("=")[0].strip()
                 depProject.sdeps_append(id)
+        for project_id, p in self.projects.items():
+            p.loadInformation()
         if dosimplify:
             self.simplify()
         for project_id, p in self.projects.items():
-            p.loadInformation()
             p.resolve(self.projects)
 
     @property
@@ -122,8 +123,8 @@ class Solution:
     def simplify(self):
         """
         """
-        for pe in self.projects:
-            self.ssimplify(pe.Value)
+        for _, pe in self.projects.items():
+            self.ssimplify(pe)
 
     def ssimplify(self, p):
         """
