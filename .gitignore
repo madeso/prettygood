@@ -93,3 +93,5 @@ crashlytics.properties
 crashlytics-build.properties
 
 .vscode/*
+*.un~
+
