@@ -2,34 +2,20 @@
 
 import pattern
 
-class Column(object):
-    def __init__(self, name):
+class Column:
+    def __init__(self, name, pat):
         self.title = name
-        self.displayPattern = pattern.Compile(name)
-        self.sortPattern = None
-        self.header = None
+        self.display_pattern = pattern.Compile(pat or name)
+        self.optional_sort_pattern = None
 
-    @property
-    def Header(self):
-        return self.header
-    
-    @Header.setter
-    def Header(self, value):
-        self.header = value
-        self.updateText()
-    
-    def updateText(self):
-        if self.header != None:
-            self.header.Text = self.title
-    
-
-    @property
-    def Display(self):
-        return self.displayPattern
-
-    @property
-    def Sort(self):
-        if self.sortPattern == None:
-            return self.displayPattern
+    def sort_pattern(self):
+        if self.optional_sort_pattern == None:
+            return self.display_pattern
         else:
-            return self.sortPattern
+            return self.optional_sort_pattern
+
+    def get_display(self, functions, data):
+        return self.display_pattern.eval(functions, data)
+
+    def get_sort(self, functions, data):
+        return self.sort_pattern().eval(functions, data)
