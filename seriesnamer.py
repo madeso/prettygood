@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# helpful doc: https://tkdocs.com/tutorial/onepage.html
+
 from tkinter import *
 from tkinter import ttk
 
