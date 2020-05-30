@@ -8,6 +8,19 @@ from column import Column
 import pattern
 import keyvalueextractor
 
+# todo:
+# set cell value for current cell
+# set cell value for current column for all selected rows
+# apply formatting function for current column for all selected rows
+# save current files in json
+# provide better editing experince with shortcut hints
+# provide better editing experince when entering key value extractor pattern (live extract)
+# provide a way to inspect pattern errors
+# allow editing already entered pattern
+# gather data from external sources like imdb, tvdb and others
+# move files function
+# perhaps move from curses to https://github.com/urwid/urwid
+
 
 def hint(stdscr, t):
     height = 1
