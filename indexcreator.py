@@ -1,4 +1,6 @@
-﻿class IndexCreator:
+#!/usr/bin/env python3
+
+class IndexCreator:
     def __init__(self):
         self._index = 0
     
@@ -12,6 +14,6 @@
 
 if __name__ == "__main__":
     i = IndexCreator()
-    print i.generate(), i.generate(), i.generate(), i.generate()
+    print(i.generate(), i.generate(), i.generate(), i.generate())
     i.clear()
-    print i.generate(), i.generate(), i.generate(), i.generate()
+    print(i.generate(), i.generate(), i.generate(), i.generate())
