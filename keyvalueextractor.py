@@ -1,4 +1,6 @@
-﻿import os
+#!/usr/bin/env python3
+
+import os
 
 
 def _CountDirectorySeperators(pattern):
