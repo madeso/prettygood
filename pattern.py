@@ -1,4 +1,6 @@
-﻿#format:
+#!/usr/bin/env python3
+
+#format:
 # %arg% replaces arg with its value, error if missing
 # [arg] replaces arg with its value, "" if missing
 # $func(arg,arg,arg) calls func
@@ -195,21 +197,22 @@ def _opt(args, i, d=None):
 
 def DefaultFunctions():
     return {
-      "title": lambda(args):args[0].title()
-    , "capitalize": lambda(args):args[0].capitalize()
-    , "lower": lambda(args):args[0].lower()
-    , "upper": lambda(args):args[0].upper()
-    , "swapcase": lambda(args):args[0].swapcase()
-    , "rtrim": lambda(args):args[0].rstrip(_opt(args,1))
-    , "ltrim": lambda(args):args[0].lstrip(_opt(args,1))
-    , "trim": lambda(args):args[0].strip(_opt(args,1))
-    , "zfill": lambda(args):args[0].zfill(int(_opt(args,1, "8")))
-    , "replace": lambda(args):args[0].replace(args[1], args[2], _opt(args, 3))
+      "title": lambda args: args[0].title()
+    , "capitalize": lambda args: args[0].capitalize()
+    , "lower": lambda args: args[0].lower()
+    , "upper": lambda args: args[0].upper()
+    , "swapcase": lambda args: args[0].swapcase()
+    , "rtrim": lambda args: args[0].rstrip(_opt(args,1))
+    , "ltrim": lambda args: args[0].lstrip(_opt(args,1))
+    , "trim": lambda args: args[0].strip(_opt(args,1))
+    , "zfill": lambda args: args[0].zfill(int(_opt(args,1, "8")))
+    , "replace": lambda args: args[0].replace(args[1], args[2], _opt(args, 3))
     }
 
+
 if __name__ == "__main__":
-    data = {"artist":"Zynic", "title":"dreams in black and white", "album":"Dreams In Black And White", "track":"1"}
-    print Compile("%artist% - %title% (%album%)").eval(DefaultFunctions(), data)
-    print Compile("%artist% - $title(%title%) (%album%)").eval(DefaultFunctions(), data)
-    print Compile("$zfill(%track%,3). $title(%title%)").eval(DefaultFunctions(), data)
+    data = {"artist":"Zynic", "title":"dreams in black and white", "album":"Dreams", "track":"1"}
+    print(Compile("%artist% - %title% (%album%)").eval(DefaultFunctions(), data))
+    print(Compile("%artist% - $title(%title%) (%album%)").eval(DefaultFunctions(), data))
+    print(Compile("$zfill(%track%,3). $title(%title%)").eval(DefaultFunctions(), data))
     #print _ParseArguments(0, "a,b(1, 3),c)")
