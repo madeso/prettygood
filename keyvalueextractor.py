@@ -38,7 +38,10 @@ class KeyValueExtractor:
     def __init__(self):
         self.numberOfDirectorySeperators = 0
         self.matchers = []
-    
+
+    def get_keys(self):
+        return [m.data for m in self.matchers if m.isText is False]
+
     def _getSearchableString(self, path):
         s = ""
         s += os.path.splitext(os.path.basename(path))[0]
