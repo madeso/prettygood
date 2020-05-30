@@ -1,4 +1,8 @@
-﻿class Column(object):
+#!/usr/bin/env python3
+
+from pattern import *
+
+class Column(object):
     def __init__(self, name):
         self.title = name
         self.displayPattern = Pattern("eval " + name)
@@ -15,8 +19,8 @@
         self.updateText()
     
     def updateText(self):
-        if header != None:
-            header.Text = title
+        if self.header != None:
+            self.header.Text = self.title
     
 
     @property
