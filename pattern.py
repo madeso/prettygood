@@ -167,7 +167,8 @@ class _Parser:
             if self.mem != "":
                 self.nodes.append(_Attribute(self.mem))
             else:
-                self.nodes.append(_Text(_Parser.VARSIGN))
+                raise SyntaxError("varsign?")
+                # self.nodes.append(_Text(_Parser.VARSIGN))
         elif self.state == State.FUNC:
             if args == None:
                 raise SyntaxError("weird func call")

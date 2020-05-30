@@ -43,7 +43,7 @@ class KeyValueExtractor:
         s = ""
         s += os.path.splitext(os.path.basename(path))[0]
         d = os.path.dirname(path)
-        for i in range(0, self.numberOfDirectorySeperators):
+        for _ in range(0, self.numberOfDirectorySeperators):
             s = os.path.basename(d) + os.sep + s
             d = os.path.dirname(d)
         return s

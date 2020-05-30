@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-from pattern import *
+import pattern
 
 class Column(object):
     def __init__(self, name):
         self.title = name
-        self.displayPattern = Pattern("eval " + name)
+        self.displayPattern = pattern.Compile(name)
         self.sortPattern = None
         self.header = None
 
