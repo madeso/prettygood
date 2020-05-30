@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 # helpful doc: https://tkdocs.com/tutorial/onepage.html
+# table https://github.com/ragardner/tksheet
+# https://stackoverflow.com/questions/9348264/does-tkinter-have-a-table-widget
 
 from tkinter import *
 from tkinter import ttk
