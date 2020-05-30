@@ -6,6 +6,7 @@ import os.path
 
 from column import Column
 import pattern
+import keyvalueextractor
 
 
 def hint(stdscr, t):
@@ -42,6 +43,62 @@ def text_input(stdscr, title):
     return box.gather()
 
 
+def filter_dialog(stdscr, src_data, prop):
+    run = True
+    kve = None
+    files = [d[prop] for d in src_data]
+    if len(files) == 0:
+        message(stdscr, 'no files to process')
+        return
+    while run:
+        if kve is None:
+            k = text_input(stdscr, 'Enter pattern')
+            try:
+                kve = keyvalueextractor.Compile(k)
+            except keyvalueextractor.FormatError:
+                message(stdscr, 'format error')
+        stdscr.clear()
+        startx = 2
+        starty = 0
+        nextx = 0
+
+        for row_index, f in enumerate(files):
+            display = f[:10]
+            stdscr.addstr(row_index+starty + 1, startx, display)
+            nextx = max(nextx, startx + len(display) + 1)
+
+        startx = nextx
+        nextx = 0
+
+        if kve is not None:
+            for col_index, col in enumerate(kve.get_keys()):
+                stdscr.addstr(starty, startx, col, curses.A_REVERSE)
+                nextx = max(nextx, startx + len(col) + 1)
+                for row_index, f in enumerate(files):
+                    ex, err = kve.extract(f)
+                    display = ex[col] if col in ex else ''
+                    stdscr.addstr(row_index+starty + 1, startx, display)
+                    nextx = max(nextx, startx + len(display) + 1)
+                startx = nextx
+                nextx = 0
+        stdscr.refresh()
+        input = stdscr.getch()
+        if input == ord('e'):
+            kve = None
+        elif input == ord('r'):
+            for src in src_data:
+                f = src[prop]
+                ex, _ = kve.extract(f)
+                for col in kve.get_keys():
+                    display = ex[col] if col in ex else ''
+                    src[col] = display
+            run = False
+        elif input == ord('q'):
+            run = False
+        else:
+            message(stdscr, 'unknown new input: {}'.format(input))
+
+
 def gui(stdscr, args):
     run = True
     current_row = 0
@@ -56,7 +113,6 @@ def gui(stdscr, args):
 
     while run:
         stdscr.clear()
-        # This raises ZeroDivisionError when i == 10.
         startx = 2
         starty = 0
         nextx = 0
@@ -81,10 +137,20 @@ def gui(stdscr, args):
         input = stdscr.getch()
         if input == ord('q'):
             run = False
+        elif input == ord('a'):
+            selected = [False for _ in selected]
+        elif input == ord('A'):
+            selected = [True for _ in selected]
         elif input == ord(' '):
             selected[current_row] = not selected[current_row]
+        elif input == ord('e'):
+            s = [d for s, d in zip(selected, datas) if s]
+            if len(s) == 0:
+                message(stdscr, 'no files selected')
+            else:
+                filter_dialog(stdscr, s, 'file')
         elif input == ord('n'):
-            hint(stdscr, 'New column...')
+            hint(stdscr, 'new Column...')
             input = stdscr.getch()
             if input == ord('c'):
                 p = text_input(stdscr, "column format")
