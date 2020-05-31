@@ -3,6 +3,7 @@ import curses
 import curses.textpad
 import argparse
 import os.path
+import math
 
 from column import Column
 import pattern
@@ -25,9 +26,10 @@ import keyvalueextractor
 def hint(stdscr, t):
     height = 1
     width = len(t) + 1
-    y = 2
-    x = 1
-    curses.textpad.rectangle(stdscr, y-1, x-1, 1+height+1, 1+width+1)
+    wh, ww = stdscr.getmaxyx()
+    y = int(math.floor(wh/2))-1
+    x = int(math.floor((ww - width)/2))
+    curses.textpad.rectangle(stdscr, y-1, x-1, y+height, x+width+1)
     stdscr.addstr(y, x, ' {} '.format(t))
 
 
