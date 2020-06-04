@@ -21,6 +21,11 @@ import keyvalueextractor
 # gather data from external sources like imdb, tvdb and others
 # move files function
 # perhaps move from curses to https://github.com/urwid/urwid
+# save common extraction patterns and "auto extract" smartly
+# add/remove to selection with missing/has value, regex file/value matching
+# auto add columns based on rows
+# change column title and sort
+# imdb lookup and create nfo file for "xmdb"
 
 
 def hint(stdscr, t):
