@@ -1,4 +1,6 @@
 # from: https://www.youtube.com/watch?v=gR73nLbbgqY
+# also might be good to get data from https://www.youtube.com/watch?v=ubXXmQzzNGo
+# look into click for replacing argparse?
 
 
 import logging
