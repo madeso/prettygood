@@ -44,6 +44,23 @@ def message(stdscr, text):
     stdscr.getch()
 
 
+class TextboxCallback(curses.textpad.Textbox):
+    def __init__(self, win, callback):
+        super().__init__(win)
+        self.callback = callback
+        self.win = win
+
+    def do_command(self, ch):
+        r = super().do_command(ch)
+        # gather always places cursor at the end
+        # you can use stdscr.getyx() and stdscr.move(y,x) 
+        cy, cx = self.win.getyx() 
+        content = self.gather()
+        self.win.move(cy,cx) 
+        self.callback(content, self.win)
+        return r
+
+
 def text_input(stdscr, title):
     stdscr.addstr(0, 0, "{}: (hit Ctrl-G to send)".format(title))
 
@@ -63,6 +80,28 @@ def text_input(stdscr, title):
     return box.gather()
 
 
+def text_input_callback(stdscr, title, callback):
+    stdscr.addstr(0, 0, "{}: (hit Ctrl-G to send)".format(title))
+
+    height = 1
+    width = 60
+    y = 2
+    x = 1
+
+    editwin = curses.newwin(height, width, y, x)
+    def render():
+        curses.textpad.rectangle(stdscr, y-1, x-1, 1+height+1, 1+width+1)
+        stdscr.refresh()
+    render()
+
+    curses.curs_set(1)
+    box = TextboxCallback(editwin, lambda text, win: callback(text, win, render))
+    box.edit()
+    curses.curs_set(0)
+    return box.gather()
+
+
+
 def filter_dialog(stdscr, src_data, prop):
     run = True
     kve = None
@@ -70,14 +109,8 @@ def filter_dialog(stdscr, src_data, prop):
     if len(files) == 0:
         message(stdscr, 'no files to process')
         return
-    while run:
-        if kve is None:
-            k = text_input(stdscr, 'Enter pattern')
-            try:
-                kve = keyvalueextractor.Compile(k)
-            except keyvalueextractor.FormatError:
-                message(stdscr, 'format error')
-        stdscr.clear()
+
+    def render_table(kve):
         startx = 2
         starty = 0
         nextx = 0
@@ -95,12 +128,38 @@ def filter_dialog(stdscr, src_data, prop):
                 stdscr.addstr(starty, startx, col, curses.A_REVERSE)
                 nextx = max(nextx, startx + len(col) + 1)
                 for row_index, f in enumerate(files):
-                    ex, err = kve.extract(f)
-                    display = ex[col] if col in ex else ''
-                    stdscr.addstr(row_index+starty + 1, startx, display)
-                    nextx = max(nextx, startx + len(display) + 1)
+                    try:
+                        ex, err = kve.extract(f)
+                        display = ex[col] if col in ex else ''
+                        stdscr.addstr(row_index+starty + 1, startx, display)
+                        nextx = max(nextx, startx + len(display) + 1)
+                    except keyvalueextractor.FormatError:
+                        pass
                 startx = nextx
                 nextx = 0
+
+    def on_input(input, win, render):
+        kve = None
+        try:
+            kve = keyvalueextractor.Compile(input)
+        except keyvalueextractor.FormatError:
+            pass
+        stdscr.clear()
+        render_table(kve)
+        render()
+        win.redrawwin()
+        win.refresh()
+
+    while run:
+        if kve is None:
+            k = text_input_callback(stdscr, 'Enter pattern', on_input)
+            # k = text_input(stdscr, 'Enter pattern')
+            try:
+                kve = keyvalueextractor.Compile(k)
+            except keyvalueextractor.FormatError:
+                message(stdscr, 'format error')
+        stdscr.clear()
+        render_table(kve)
         stdscr.refresh()
         input = stdscr.getch()
         if input == ord('e'):
