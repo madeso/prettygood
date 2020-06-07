@@ -14,9 +14,9 @@ class Lang:
 
     def add(self, w):
         t = _clean_word(w)
-        if t == '':
+        if t != '':
             if t not in self.Words:
-                self.Words[t] = w
+                self.Words[t] = w.strip()
 
     def DetermineValidWords(self, l):
         for ss in l:
@@ -31,6 +31,8 @@ def load_language(path):
         lines = f.readlines()
         for word in lines:
             lang.add(word)
+    if len(lang.Words) == 0:
+        print('ERROR: no loaded words')
     return lang
 
 
@@ -50,7 +52,7 @@ def ListCombinations(p):
 
 
 def print_words(lang, input):
-    for s in lang.DetermineValidWords(ListCombinations(input)):
+    for s in lang.DetermineValidWords(set(ListCombinations(input))):
         print(s)
 
 
