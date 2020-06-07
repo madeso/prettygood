@@ -35,7 +35,8 @@ def replace_all(folder, src, args, ext):
     for c in args.invalid:
         dst = dst.replace(c, args.replace)
     if args.trim:
-        dst = dst.strip()
+        # also removes spaces in the middle, but that is fine
+        dst = ' '.join(dst.split())
     if args.lowercase:
         dst = dst.lower()
     if src != dst and os.path.exists(os.path.join(folder, dst+ext)):
