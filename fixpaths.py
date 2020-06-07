@@ -36,6 +36,8 @@ def replace_all(folder, src, args, ext):
         dst = dst.replace(c, args.replace)
     if args.trim:
         dst = dst.strip()
+    if args.lowercase:
+        dst = dst.lower()
     if src != dst and os.path.exists(os.path.join(folder, dst+ext)):
         print('duplicate detected', src, dst)
         if args.fix_duplicates:
@@ -44,8 +46,6 @@ def replace_all(folder, src, args, ext):
                 if not os.path.exists(os.path.join(folder, d+ext)):
                     dst = d
                     break
-    if args.lowercase:
-        dst = dst.lower()
     return dst + ext
 
 
