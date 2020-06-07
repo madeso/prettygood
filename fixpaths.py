@@ -11,7 +11,7 @@ LOG = logging.getLogger('logger')
 
 def rename(src, dst, args):
     if args.nop:
-        print('not renaming', src, dst)
+        print('not renaming', os.path.basename(src), os.path.basename(dst))
     else:
         print('renaming', src, dst)
         if os.path.exists(dst):
