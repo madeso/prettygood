@@ -80,7 +80,7 @@ def main():
     parser.add_argument('input', metavar='f', nargs='+', help='files or directories to rename')
     parser.add_argument('--nop', action='store_true', help="don't do anything")
     parser.add_argument('--verbose', action='store_true', help='verbose logging')
-    parser.add_argument('--invalid', default='[]|#$%^?<>;:\\/"''')
+    parser.add_argument('--invalid', default='*[]|#$%^?<>;:\\/"''')
     parser.add_argument('--replace', default='_', help='replace string')
     parser.add_argument('--no-trim', action='store_false', dest='trim', help="don't remove spaces at start and end")
     args = parser.parse_args()
