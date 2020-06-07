@@ -30,19 +30,29 @@ def rename(src, dst, args):
             LOG.error(error)
 
 
-def replace_all(src, args):
+def replace_all(folder, src, args, ext):
     dst = src
     for c in args.invalid:
         dst = dst.replace(c, args.replace)
     if args.trim:
         dst = dst.strip()
-    return dst
+    if src != dst and os.path.exists(os.path.join(folder, dst+ext)):
+        print('duplicate detected', src, dst)
+        if args.fix_duplicates:
+            for id in range(1, 100):
+                d = '{}_dup{}'.format(dst, id)
+                if not os.path.exists(os.path.join(folder, d+ext)):
+                    dst = d
+                    break
+    if args.lowercase:
+        dst = dst.lower()
+    return dst + ext
 
 
 def run_file(f, args):
     folder, src = os.path.split(f)
     name_ext = os.path.splitext(src)
-    dst = replace_all(name_ext[0], args) + name_ext[1]
+    dst = replace_all(folder, name_ext[0], args, name_ext[1])
     if src != dst:
         fp = os.path.join(folder, dst)
         rename(f, fp, args)
@@ -52,7 +62,7 @@ def run_file(f, args):
 
 def run_directory(d, args):
     folder, src = os.path.split(d)
-    dst = replace_all(src, args)
+    dst = replace_all(folder, src, args, '')
     target = os.path.join(folder, dst)
     if src != dst:
         rename(d, target, args)
@@ -80,9 +90,11 @@ def main():
     parser.add_argument('input', metavar='f', nargs='+', help='files or directories to rename')
     parser.add_argument('--nop', action='store_true', help="don't do anything")
     parser.add_argument('--verbose', action='store_true', help='verbose logging')
-    parser.add_argument('--invalid', default='*[]|#$%^?<>;:\\/"''')
+    parser.add_argument('--invalid', default='*[]|#$%^?<>;:\\/"''', help='invalid chars to replace')
     parser.add_argument('--replace', default='_', help='replace string')
     parser.add_argument('--no-trim', action='store_false', dest='trim', help="don't remove spaces at start and end")
+    parser.add_argument('--no-duplicate-fix', action='store_false', dest='fix_duplicates', help="don't append numbers on file collisions")
+    parser.add_argument('--no-lower-case', action='store_false', dest='lowercase', help="don't make lowercase")
     args = parser.parse_args()
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
