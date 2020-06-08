@@ -47,7 +47,10 @@ def all_permutations(string):
         for index, char in enumerate(string):
             rest_of_string = index_removed_from_string(index, string)
             for permutation in all_permutations(rest_of_string):
-                yield char + permutation
+                if isinstance(permutation, list):
+                    yield [char] + permutation
+                else:
+                    yield char + permutation
 
 
 def main():
@@ -58,7 +61,10 @@ def main():
 
     if args.dictionary == 'ls':
         for permutation in all_permutations(args.word):
-            print(permutation)
+            print(permutation.strip())
+    elif args.dictionary == 'lsl':
+        for permutation in all_permutations(args.word.split(' ')):
+            print(' '.join(permutation))
     else:
         lang = load_language(args.dictionary)
         permutations = set(all_permutations(args.word))
