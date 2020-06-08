@@ -67,12 +67,12 @@ def main():
             print(' '.join(permutation))
     else:
         lang = load_language(args.dictionary)
-        permutations = set(all_permutations(args.word))
+        permutations = set(p.strip() for p in all_permutations(args.word.lower()))
 
         for permutation in permutations:
-            word = lang.as_valid_word(permutation)
-            if word is not None:
-                print(word)
+            words = [lang.as_valid_word(w) for w in permutation.split(' ')]
+            if all(word is not None for word in words):
+                print(' '.join(words))
 
 if __name__ == "__main__":
     main()
