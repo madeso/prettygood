@@ -18,11 +18,12 @@ class Lang:
             if t not in self.Words:
                 self.Words[t] = w.strip()
 
-    def DetermineValidWords(self, l):
-        for ss in l:
-            s = _clean_word(ss)
-            if s in self.Words:
-                yield self.Words[s]
+    def as_valid_word(self, ss):
+        s = _clean_word(ss)
+        if s in self.Words:
+            return self.Words[s]
+        else:
+            return None
 
 
 def load_language(path):
@@ -36,24 +37,19 @@ def load_language(path):
     return lang
 
 
-def index_removed_from_string(index, strObj):
-    return strObj[0 : index : ] + strObj[index + 1 : :]
+def index_removed_from_string(index, string):
+    return string[0 : index : ] + string[index + 1 : :]
 
 
-def ListCombinations(p):
+def all_permutations(p):
     if len(p) <= 1:
         yield p
     else:
         for i, a in enumerate(p):
             b = index_removed_from_string(i, p)
-            for s in ListCombinations(b):
+            for s in all_permutations(b):
                 r = a + s
                 yield r
-
-
-def print_words(lang, input):
-    for s in lang.DetermineValidWords(set(ListCombinations(input))):
-        print(s)
 
 
 def main():
@@ -63,11 +59,16 @@ def main():
     args = parser.parse_args()
 
     if args.dictionary == 'ls':
-        for c in ListCombinations(args.word):
+        for c in all_permutations(args.word):
             print(c)
     else:
         lang = load_language(args.dictionary)
-        print_words(lang, args.word)
+        permutations = set(all_permutations(args.word))
+
+        for s in permutations:
+            word = lang.as_valid_word(s)
+            if word is not None:
+                print(s)
 
 if __name__ == "__main__":
     main()
