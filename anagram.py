@@ -2,34 +2,33 @@
 import argparse
 
 
-def _clean_word(w):
-    l = w.lower()
-    for c in "-_&+/":
-        l = l.replace(c, "")
-    return l.strip()
+def _clean_word(word):
+    cleaned = word.lower()
+    for char in "-_&+/":
+        cleaned = cleaned.replace(char, "")
+    return cleaned.strip()
 
 
 class Lang:
     Words = {}
 
     def add(self, w):
-        t = _clean_word(w)
-        if t != '':
-            if t not in self.Words:
-                self.Words[t] = w.strip()
+        key = _clean_word(w)
+        if key != '':
+            if key not in self.Words:
+                self.Words[key] = w.strip()
 
     def as_valid_word(self, ss):
-        s = _clean_word(ss)
-        if s in self.Words:
-            return self.Words[s]
-        else:
-            return None
+        key = _clean_word(ss)
+        if key in self.Words:
+            return self.Words[key]
+        return None
 
 
 def load_language(path):
     lang = Lang()
-    with open(path) as f:
-        lines = f.readlines()
+    with open(path) as handle:
+        lines = handle.readlines()
         for word in lines:
             lang.add(word)
     if len(lang.Words) == 0:
@@ -41,15 +40,14 @@ def index_removed_from_string(index, string):
     return string[0 : index : ] + string[index + 1 : :]
 
 
-def all_permutations(p):
-    if len(p) <= 1:
-        yield p
+def all_permutations(string):
+    if len(string) <= 1:
+        yield string
     else:
-        for i, a in enumerate(p):
-            b = index_removed_from_string(i, p)
-            for s in all_permutations(b):
-                r = a + s
-                yield r
+        for index, char in enumerate(string):
+            rest_of_string = index_removed_from_string(index, string)
+            for permutation in all_permutations(rest_of_string):
+                yield char + permutation
 
 
 def main():
@@ -59,16 +57,16 @@ def main():
     args = parser.parse_args()
 
     if args.dictionary == 'ls':
-        for c in all_permutations(args.word):
-            print(c)
+        for permutation in all_permutations(args.word):
+            print(permutation)
     else:
         lang = load_language(args.dictionary)
         permutations = set(all_permutations(args.word))
 
-        for s in permutations:
-            word = lang.as_valid_word(s)
+        for permutation in permutations:
+            word = lang.as_valid_word(permutation)
             if word is not None:
-                print(s)
+                print(word)
 
 if __name__ == "__main__":
     main()
