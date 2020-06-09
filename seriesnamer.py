@@ -137,7 +137,11 @@ def filter_dialog(stdscr, src_data, prop):
                 startx = nextx
                 nextx = 0
 
-    TABLE_INPUT_Y = 4
+    TABLE_INPUT_Y = 6
+    highlight_index = 0
+
+    def render_highlight():
+        stdscr.addstr(TABLE_INPUT_Y - 2, 2, files[highlight_index])
 
     def on_input(input, win, render):
         kve = None
@@ -146,6 +150,7 @@ def filter_dialog(stdscr, src_data, prop):
         except keyvalueextractor.FormatError:
             pass
         stdscr.clear()
+        render_highlight()
         render_table(kve, TABLE_INPUT_Y)
         render()
         win.redrawwin()
@@ -154,6 +159,7 @@ def filter_dialog(stdscr, src_data, prop):
     while run:
         if kve is None:
             stdscr.clear()
+            render_highlight()
             render_table(kve, TABLE_INPUT_Y)
             stdscr.refresh()
 
