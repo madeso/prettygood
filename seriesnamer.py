@@ -20,7 +20,7 @@ import keyvalueextractor
 # allow editing already entered pattern
 # gather data from external sources like imdb, tvdb and others
 # move files function
-# perhaps move from curses to https://github.com/urwid/urwid
+# perhaps move from curses to https://github.com/urwid/urwid and the table widget from https://github.com/ragardner/tksheet
 # save common extraction patterns and "auto extract" smartly
 # add/remove to selection with missing/has value, regex file/value matching
 # auto add columns based on rows
