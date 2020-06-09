@@ -110,9 +110,8 @@ def filter_dialog(stdscr, src_data, prop):
         message(stdscr, 'no files to process')
         return
 
-    def render_table(kve):
+    def render_table(kve, starty):
         startx = 2
-        starty = 0
         nextx = 0
 
         for row_index, f in enumerate(files):
@@ -138,6 +137,8 @@ def filter_dialog(stdscr, src_data, prop):
                 startx = nextx
                 nextx = 0
 
+    TABLE_INPUT_Y = 4
+
     def on_input(input, win, render):
         kve = None
         try:
@@ -145,13 +146,17 @@ def filter_dialog(stdscr, src_data, prop):
         except keyvalueextractor.FormatError:
             pass
         stdscr.clear()
-        render_table(kve)
+        render_table(kve, TABLE_INPUT_Y)
         render()
         win.redrawwin()
         win.refresh()
 
     while run:
         if kve is None:
+            stdscr.clear()
+            render_table(kve, TABLE_INPUT_Y)
+            stdscr.refresh()
+
             k = text_input_callback(stdscr, 'Enter pattern', on_input)
             # k = text_input(stdscr, 'Enter pattern')
             try:
@@ -159,7 +164,7 @@ def filter_dialog(stdscr, src_data, prop):
             except keyvalueextractor.FormatError:
                 message(stdscr, 'format error')
         stdscr.clear()
-        render_table(kve)
+        render_table(kve, 0)
         stdscr.refresh()
         input = stdscr.getch()
         if input == ord('e'):
