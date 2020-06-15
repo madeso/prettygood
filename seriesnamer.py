@@ -101,16 +101,34 @@ def text_input_callback(stdscr, title, callback):
     return box.gather()
 
 
+class Option:
+    def __init__(self, name, key, callback):
+        self.name = name
+        self.key = key
+        self.callback = callback
 
-def filter_dialog(stdscr, src_data, prop):
-    run = True
-    kve = None
-    files = [d[prop] for d in src_data]
-    if len(files) == 0:
-        message(stdscr, 'no files to process')
-        return
 
-    def render_table(kve, starty):
+def menu(options):
+    text = ' '.join(opt.name for opt in options)
+    height, width = stdscr.getmaxyx()
+    stdscr.addstr(height-1, 10, '{}'.format(text))
+    key = stdscr.getch()
+    for opt in options:
+        if opt.key == key:
+            opt.callback()
+
+TABLE_INPUT_Y = 6
+
+class FilterDialog:
+    def __init__(self, stdscr, src_data, prop):
+        self.stdscr = stdscr
+        self.src_data = src_data
+        self.prop = prop
+        self.kve = None
+        self.files = [d[prop] for d in src_data]
+        self.highlight_index = 0
+
+    def render_table(self, kve, starty):
         startx = 2
         nextx = 0
 
@@ -137,13 +155,10 @@ def filter_dialog(stdscr, src_data, prop):
                 startx = nextx
                 nextx = 0
 
-    TABLE_INPUT_Y = 6
-    highlight_index = 0
-
-    def render_highlight():
+    def render_highlight(self):
         stdscr.addstr(TABLE_INPUT_Y - 2, 2, files[highlight_index])
 
-    def on_input(input, win, render):
+    def on_input(self, input, win, render):
         kve = None
         try:
             kve = keyvalueextractor.Compile(input)
@@ -156,37 +171,49 @@ def filter_dialog(stdscr, src_data, prop):
         win.redrawwin()
         win.refresh()
 
-    while run:
-        if kve is None:
-            stdscr.clear()
-            render_highlight()
-            render_table(kve, TABLE_INPUT_Y)
-            stdscr.refresh()
+    def run_dialog(self):
+        run = True
+        while run:
+            if kve is None:
+                stdscr.clear()
+                render_highlight()
+                render_table(kve, TABLE_INPUT_Y)
+                stdscr.refresh()
 
-            k = text_input_callback(stdscr, 'Enter pattern', on_input)
-            # k = text_input(stdscr, 'Enter pattern')
-            try:
-                kve = keyvalueextractor.Compile(k)
-            except keyvalueextractor.FormatError:
-                message(stdscr, 'format error')
-        stdscr.clear()
-        render_table(kve, 0)
-        stdscr.refresh()
-        input = stdscr.getch()
-        if input == ord('e'):
-            kve = None
-        elif input == ord('r'):
-            for src in src_data:
-                f = src[prop]
-                ex, _ = kve.extract(f)
-                for col in kve.get_keys():
-                    display = ex[col] if col in ex else ''
-                    src[col] = display
-            run = False
-        elif input == ord('q'):
-            run = False
-        else:
-            message(stdscr, 'unknown new input: {}'.format(input))
+                k = text_input_callback(stdscr, 'Enter pattern', on_input)
+                # k = text_input(stdscr, 'Enter pattern')
+                try:
+                    kve = keyvalueextractor.Compile(k)
+                except keyvalueextractor.FormatError:
+                    message(stdscr, 'format error')
+            stdscr.clear()
+            render_table(kve, 0)
+            stdscr.refresh()
+            # menu([Option('Extract', ord('e'), lambda: kve = None),
+            input = stdscr.getch()
+            if input == ord('e'):
+                kve = None
+            elif input == ord('r'):
+                for src in src_data:
+                    f = src[prop]
+                    ex, _ = kve.extract(f)
+                    for col in kve.get_keys():
+                        display = ex[col] if col in ex else ''
+                        src[col] = display
+                run = False
+            elif input == ord('q'):
+                run = False
+            else:
+                message(stdscr, 'unknown new input: {}'.format(input))
+
+
+def filter_dialog(stdscr, src_data, prop):
+    dialog = FilterDialog(stdscr, src_data, prop)
+    if len(dialog.files) == 0:
+        message(stdscr, 'no files to process')
+        return
+
+    dialog.run_dialog()
 
 
 def gui(stdscr, args):
