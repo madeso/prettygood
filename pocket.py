@@ -12,6 +12,7 @@ import collections
 ########################################################################################################################
 # Common functions
 
+
 def file_exist(file: str) -> bool:
     return os.path.isfile(file)
 
@@ -43,11 +44,11 @@ def set_user_data(data: Data):
 
 
 class Settings:
-    def __init__(self, name, default_value):
+    def __init__(self, name: str, default_value):
         self.name = name
         self.default_value = default_value
 
-    def get_value(self, data:Data):
+    def get_value(self, data: Data):
         if self.name not in data.data:
             return self.default_value
         else:
@@ -56,7 +57,7 @@ class Settings:
     def set_value(self, data: Data, value):
         data.data[self.name] = value
 
-    def set_defualt_if_missing(self, data: Data):
+    def set_default_if_missing(self, data: Data):
         if self.name not in data.data:
             data.data[self.name] = self.default_value
 
@@ -88,16 +89,16 @@ POCKET_GET = 'https://getpocket.com/v3/get'
 POCKET_SEND = 'https://getpocket.com/v3/send'
 
 
-def get_pocket_request(url, data):
+def get_pocket_request(url: str, data) -> dict:
     the_method = 'GET' if data is None else 'POST'
-    r = urllib.request.Request(url=url, method=the_method)
+    request = urllib.request.Request(url=url, method=the_method)
     if data is not None:
-        r.add_header('Content-Type', 'application/json; charset=UTF8')
+        request.add_header('Content-Type', 'application/json; charset=UTF8')
 
-    r.add_header('X-Accept', 'application/json')
+    request.add_header('X-Accept', 'application/json')
     data_encoded = json.dumps(data).encode('utf-8') if data is not None else None
-    with urllib.request.urlopen(r, data=data_encoded) as f:
-        return json.loads(f.read().decode('utf-8'))
+    with urllib.request.urlopen(request, data=data_encoded) as file_handle:
+        return json.loads(file_handle.read().decode('utf-8'))
 
 
 def get_cache_file_name() -> str:
@@ -105,8 +106,8 @@ def get_cache_file_name() -> str:
 
 
 class Post:
-    def __init__(self, postid, post):
-        self.id = postid
+    def __init__(self, post_id: str, post: dict):
+        self.id = post_id
         self.title = post['given_title']
         if len(self.title) < 1:
             self.title = post['resolved_title']
@@ -115,15 +116,15 @@ class Post:
         self.url = post['resolved_url']
 
 
-def get_all_pockets_data(refresh: bool):
+def get_all_pockets_data(refresh: bool) -> dict:
     data = get_user_data()
 
     if ACCESS_TOKEN.get_value(data) == '':
-        return []
+        return {}
     if not refresh and file_exist(get_cache_file_name()):
-        # todo(Gustav): check for latest if enought time has passed
-        with open(get_cache_file_name(), 'r', encoding="utf-8") as f:
-            return json.loads(f.read())
+        # todo(Gustav): check for latest if enough time has passed
+        with open(get_cache_file_name(), 'r', encoding="utf-8") as file_handle:
+            return json.loads(file_handle.read())
     else:
         print('Downloading posts from pocket...')
         request_data = {
@@ -131,17 +132,17 @@ def get_all_pockets_data(refresh: bool):
             'access_token': ACCESS_TOKEN.get_value(data)
         }
         gets = get_pocket_request(POCKET_GET, request_data)
-        with open(get_cache_file_name(), 'w', encoding="utf-8") as f:
-            print(json.dumps(gets, sort_keys=True, indent=4), file=f)
+        with open(get_cache_file_name(), 'w', encoding="utf-8") as file_handle:
+            print(json.dumps(gets, sort_keys=True, indent=4), file=file_handle)
         return gets
 
 
-def set_all_pockets_data(data):
-    with open(get_cache_file_name(), 'w', encoding="utf-8") as f:
-        print(json.dumps(data, sort_keys=True, indent=4), file=f)
+def set_all_pockets_data(data: dict):
+    with open(get_cache_file_name(), 'w', encoding="utf-8") as file_handle:
+        print(json.dumps(data, sort_keys=True, indent=4), file=file_handle)
 
 
-def pocket_data_remove_post(data, post_id):
+def pocket_data_remove_post(data: dict, post_id) -> dict:
     posts = data['list']
     posts.pop(post_id)
     return data
@@ -150,9 +151,9 @@ def pocket_data_remove_post(data, post_id):
 def get_all_pockets(args, refresh=False) -> typing.List[Post]:
     data = get_all_pockets_data(refresh)
     ret = []
-    for postid, post in data['list'].items():
+    for post_id, post_data in data['list'].items():
         add = True
-        post = Post(postid, post)
+        post = Post(post_id, post_data)
 
         if args.filter != '' and args.filter not in post.url:
             add = False
@@ -167,17 +168,17 @@ def get_all_add_subargs(sub):
     sub.add_argument('--filter', default='', help='url filter')
 
 
-def mark_for_delete(data: Data, p: Post):
-    dl: typing.List[int] = DELETE_LIST.get_value(data)
-    dl.append(p.id)
-    DELETE_LIST.set_value(data, dl)
-    print('Deleting id ', p.id)
+def mark_for_delete(data: Data, post: Post):
+    delete_list: typing.List[int] = DELETE_LIST.get_value(data)
+    delete_list.append(int(post.id))
+    DELETE_LIST.set_value(data, delete_list)
+    print('Deleting id ', post.id)
 
 
 ########################################################################################################################
 # handler functions
 
-def handle_setup(args):
+def handle_setup(_args):
     data = get_user_data()
 
     if REQUEST_TOKEN.get_value(data) == '':
@@ -186,12 +187,13 @@ def handle_setup(args):
             'consumer_key': POCKET_CONSUMER_KEY,
             'redirect_uri': 'www.google.com'
         }
-        r = get_pocket_request(POCKET_REQUEST, request_data)
+        request = get_pocket_request(POCKET_REQUEST, request_data)
 
-        REQUEST_TOKEN.set_value(data, r['code'])
+        REQUEST_TOKEN.set_value(data, request['code'])
         set_user_data(data)
 
-        auth_url = 'https://getpocket.com/auth/authorize?request_token={}&redirect_uri=www.google.com'.format(REQUEST_TOKEN.get_value(data))
+        auth_url = 'https://getpocket.com/auth/authorize?request_token={}&redirect_uri=www.google.com'\
+            .format(REQUEST_TOKEN.get_value(data))
         print('Please go to:')
         print(auth_url)
         print('and then run setup again')
@@ -201,17 +203,17 @@ def handle_setup(args):
             'consumer_key': POCKET_CONSUMER_KEY,
             'code': REQUEST_TOKEN.get_value(data)
         }
-        r = get_pocket_request(POCKET_AUTH, request_data)
+        request = get_pocket_request(POCKET_AUTH, request_data)
         REQUEST_TOKEN.set_value(data, 'used')
-        ACCESS_TOKEN.set_value(data, r['access_token'])
-        USERNAME.set_value(data, r['username'])
+        ACCESS_TOKEN.set_value(data, request['access_token'])
+        USERNAME.set_value(data, request['username'])
         set_user_data(data)
         print('Setup done...')
     else:
         print('Setup done...')
 
 
-def handle_debug(args):
+def handle_debug(_args):
     data = get_user_data()
     print('config file', get_config_file_name())
     print('cache file', get_cache_file_name())
@@ -222,7 +224,7 @@ def handle_debug(args):
 
 def handle_refresh(args):
     args.filter = ''
-    data = get_all_pockets(args, refresh=True)
+    get_all_pockets(args, refresh=True)
 
 
 def handle_list(args):
@@ -241,7 +243,7 @@ def handle_list(args):
             print(s(p.excerpt))
         if not args.compact:
             print()
-        # pehaps add support for?
+        # perhaps add support for?
         # https://pypi.org/project/breadability/
         # https://github.com/codelucas/newspaper
 
@@ -306,15 +308,15 @@ def handle_pending(args):
         DELETE_LIST.set_value(data, [])
         set_user_data(data)
 
-    for id in DELETE_LIST.get_value(data):
-        if id in pockets:
-            p = pockets[id]
+    for link_id in DELETE_LIST.get_value(data):
+        if link_id in pockets:
+            p = pockets[link_id]
             print(s(p.title))
         else:
-            print('ERROR: missing id:', id)
+            print('ERROR: missing id:', link_id)
 
 
-def handle_push(args):
+def handle_push(_args):
     data = get_user_data()
     delete_list = DELETE_LIST.get_value(data)
     if len(delete_list) <= 0:
@@ -388,7 +390,7 @@ def main():
 
     sub = sub_parsers.add_parser('delete', help='delete posts')
     get_all_add_subargs(sub)
-    sub.add_argument('--range', type=int, default=3, help='number of newlines between each promp')
+    sub.add_argument('--range', type=int, default=3, help='number of newlines between each prompt')
     sub.add_argument('--url', dest='display_url', action='store_true', help="display post url")
     sub.add_argument('--no-date', dest='display_date', action='store_false', help="don't display date")
     sub.add_argument('--no-title', dest='display_title', action='store_false', help="don't display title")
