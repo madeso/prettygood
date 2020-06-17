@@ -45,15 +45,6 @@ def calculate_bmr3(weight: float, height: float, age: float, is_male: bool):
     return bmr_male if is_male else bmr_female
 
 
-def calculate_bmr4(weight: float, height: float, age: float, is_male: bool):
-    '''
-    Calculate basal metabolic rate according to the Mifflin St Jeor Equation.
-    '''
-    s_value = 5 if is_male else -161
-    bmr = 10*weight + 6.25*height - 5*age + s_value
-    return bmr
-
-
 def mj_to_kcal(megajoules: float) -> float:
     return 238.85 * megajoules
 
@@ -150,7 +141,7 @@ def main():
     print_bmi_table_weights(args.height)
     if args.weight is not None and args.age is not None:
         print()
-        for bmr_function in [calculate_bmr1, calculate_bmr2, calculate_bmr3, calculate_bmr4]:
+        for bmr_function in [calculate_bmr1, calculate_bmr2, calculate_bmr3]:
             bmr = bmr_function(args.height, args.weight, args.age, args.is_male)
             print_energy(bmr, args.activity)
 
