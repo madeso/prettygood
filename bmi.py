@@ -1,47 +1,70 @@
 #!/usr/bin/env python3
+
+'''
+Simple terminal-based tool for calculating BMI and TEE.
+
+References:
+https://en.wikipedia.org/wiki/Body_mass_index
+https://en.wikipedia.org/wiki/Basal_metabolic_rate#BMR_estimation_formulas
+https://en.wikipedia.org/wiki/Harris%E2%80%93Benedict_equation
+'''
+
 import argparse
 import typing
 
-# calculate basal metabolic rate
+# todo(Gustav): print percentage to next (or normal) bmi prime
 
-# The original Harris–Benedict equations published in 1918 and 1919
+
 def calculate_bmr1(weight: float, height: float, age: float, is_male: bool) -> float:
+    '''
+    Calculate basal metabolic rate according to the original
+    Harris–Benedict equations published in 1918 and 1919.
+    '''
     bmr_male = 66.5 + 13.75*weight + 5.003*height - 6.755*age
     bmr_female = 655 + 9.563*weight + 1.850*height - 4.676*age
     return bmr_male if is_male else bmr_female
 
 
-# The Harris–Benedict equations revised by Roza and Shizgal in 1984.
 def calculate_bmr2(weight: float, height: float, age: float, is_male: bool) -> float:
+    '''
+    Calculate basal metabolic rate according to
+    the Harris–Benedict equations revised by Roza and Shizgal in 1984.
+    '''
     bmr_male = 88.362 + 13.397*weight + 4.799*height - 5.677*age
     bmr_female = 447.593 + 9.247*weight + 3.098*height - 4.330*age
     return bmr_male if is_male else bmr_female
 
 
-# The Harris–Benedict equations revised by Mifflin and St Jeor in 1990
 def calculate_bmr3(weight: float, height: float, age: float, is_male: bool):
+    '''
+    Calculate basal metabolic rate according to
+    the Harris–Benedict equations revised by Mifflin and St Jeor in 1990
+    '''
     bmr_male = 10*weight + 6.25*height - 5*age + 5
     bmr_female = 10*weight + 6.25*height - 5*age - 161
     return bmr_male if is_male else bmr_female
 
 
-# The Mifflin St Jeor Equation
 def calculate_bmr4(weight: float, height: float, age: float, is_male: bool):
-    s = 5 if is_male else -161
-    bmr = 10*height + 6.25*height - 5*age + s
+    '''
+    Calculate basal metabolic rate according to the Mifflin St Jeor Equation.
+    '''
+    s_value = 5 if is_male else -161
+    bmr = 10*weight + 6.25*height - 5*age + s_value
     return bmr
 
 
-def mj_to_kcal(mj: float) -> float:
-    return 238.85 * mj
+def mj_to_kcal(megajoules: float) -> float:
+    return 238.85 * megajoules
 
 
-def displayEnergy(bmr: float, pal: float):
+def print_energy(bmr: float, pal: float):
     energy = bmr * pal
-    print("Total Energy Expenditure: {0:0.1f} MJ, ({1:0.0f} kcal)".format(energy, mj_to_kcal(energy)))
+    kcal = mj_to_kcal(energy)
+    print("Total Energy Expenditure: {0:0.1f} MJ, ({1:0.0f} kcal)".format(energy, kcal))
 
 
-# category, bmi, bmi prime
+# category, upper bmi, upper bmi prime
 BMI = [
     ('Very severely underweight', 15, 0.6),
     ('Severely underweight', 16, 0.64),
@@ -54,7 +77,7 @@ BMI = [
 ]
 
 
-def classifyBmi(bmi: float) -> str:
+def classify_bmi(bmi: float) -> str:
     for category, bmi_upper, _bmi_prime_upper in BMI:
         if bmi_upper is None or bmi <= bmi_upper:
             return category
@@ -72,10 +95,11 @@ def calculate_bmi_prime(bmi: float) -> float:
     upper_limit_optimal = 25
     return bmi/upper_limit_optimal
 
-def displayBmi(length: float, weight: float):
+
+def print_bmi(length: float, weight: float):
     bmi = calculate_bmi(length, weight)
     bmi_prime = calculate_bmi_prime(bmi)
-    print("BMI: {0:0.1f} {1:0.0f}% ({2})".format(bmi, bmi_prime*100, classifyBmi(bmi)))
+    print("BMI & prime: {0:0.1f} {1:0.0f}% ({2})".format(bmi, bmi_prime*100, classify_bmi(bmi)))
 
 
 def calculate_weight(length: float, bmi: float):
@@ -84,21 +108,19 @@ def calculate_weight(length: float, bmi: float):
     return bmi * lims
 
 
-def listWeight(length: float):
-    def f(bmi: typing.Optional[float]):
-        if bmi is None:
-            return ''
-        else:
-            return '{0:0.1f}'.format(calculate_weight(length, bmi))
-    
+def print_bmi_table_weights(length: float):
+    def bmi_to_str(bmi: typing.Optional[float]):
+        return '' if bmi is None else  '{0:0.1f}'.format(calculate_weight(length, bmi))
+
     last_upper = None
     for category, bmi_upper, _bmi_prime_upper in BMI:
-        print('{}: {} - {}'.format(category, f(last_upper), f(bmi_upper)))
+        print('{}: {} - {}'.format(category, bmi_to_str(last_upper), bmi_to_str(bmi_upper)))
         last_upper = bmi_upper
 
 
 def main():
-    parser = argparse.ArgumentParser(description='display bmi and stuff')
+    '''parsers arguments and prints bmi information'''
+    parser = argparse.ArgumentParser(description='display bmi and estimated TEE')
     parser.add_argument('height', type=float, help='height in cm')
     parser.add_argument('--weight', type=float, metavar='W', help='weight in kg')
     parser.add_argument('--age', type=float, metavar='A', help='age in years')
@@ -123,14 +145,14 @@ def main():
     args = parser.parse_args()
 
     if args.weight is not None:
-        displayBmi(args.height, args.weight)
+        print_bmi(args.height, args.weight)
         print()
-    listWeight(args.height)
+    print_bmi_table_weights(args.height)
     if args.weight is not None and args.age is not None:
         print()
-        for f in [calculate_bmr1, calculate_bmr2, calculate_bmr3, calculate_bmr4]:
-            bmr = f(args.height, args.weight, args.age, args.is_male)
-            displayEnergy(bmr, args.activity)
+        for bmr_function in [calculate_bmr1, calculate_bmr2, calculate_bmr3, calculate_bmr4]:
+            bmr = bmr_function(args.height, args.weight, args.age, args.is_male)
+            print_energy(bmr, args.activity)
 
 
 if __name__ == "__main__":
