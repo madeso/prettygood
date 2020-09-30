@@ -87,6 +87,10 @@ def calculate_bmi_prime(bmi: float) -> float:
     return bmi/upper_limit_optimal
 
 
+def print_water(weight: float):
+    print("Suggest water intake: {0:0.1f} litres".format(weight * 0.033))
+
+
 def print_bmi(length: float, weight: float):
     bmi = calculate_bmi(length, weight)
     bmi_prime = calculate_bmi_prime(bmi)
@@ -137,6 +141,7 @@ def main():
 
     if args.weight is not None:
         print_bmi(args.height, args.weight)
+        print_water(args.weight)
         print()
     print_bmi_table_weights(args.height)
     if args.weight is not None and args.age is not None:
